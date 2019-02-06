@@ -1,0 +1,19 @@
+@import url('https://fonts.googleapis.com/css?family=Mitr:300&subset=thai');
+
+body{
+  font-family: 'Mitr', sans-serif;
+}
+
+.carousel-item {
+    height: 100vh;
+    min-height: 350px;
+    background: no-repeat center center scroll;
+    -webkit-background-size: cover;
+    -moz-background-size: cover;
+    -o-background-size: cover;
+    background-size: cover;
+}
+
+.topper{
+  margin-top: 5%;
+}
