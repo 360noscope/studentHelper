@@ -19,8 +19,8 @@ class Authen
             $stmt = $this->mysql_connection->prepare("SELECT userId, password, role FROM users WHERE email = ?");
             $stmt->bind_param("s", $data["email"]);
             $stmt->execute();
-            $stmt->bind_param($id, $pass, $role);
-            while ($stmt->execute()) {
+            $stmt->bind_result($id, $pass, $role);
+            while ($stmt->fetch()) {
                 if (password_verify($data["password"], $pass)) {
                     $result["login"] = true;
                     session_start();
@@ -46,7 +46,7 @@ class Authen
             session_id($_COOKIE["STUHELP"]);
             session_start();
             session_destroy();
-            setcookie("IDPSLoginID", "", time() - 9999);
+            setcookie("STUHELP", "", time() - 9999);
         } catch (Exception $ex) {
             $result["error"] = $ex->getMessage();
         }
@@ -62,7 +62,7 @@ class Authen
 $auth = new Authen();
 $requestAction = $_POST["action"];
 if ($requestAction == "login") {
-    echo $auth->login($data["data"]);
+    echo $auth->login($_POST["data"]);
 }else if($requestAction == "logout"){
     echo $auth->logout();
 }

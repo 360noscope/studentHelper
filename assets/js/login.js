@@ -14,9 +14,9 @@ $(document).ready(function () {
             success: function (data) {
                 var returnData = JSON.parse(data);
                 if(returnData["login"] == false){
-                    $(".wrongpass").toast('show');
+                   $("#wrongpass").show();
                 }else{
-
+                    window.location.replace("./home.php");
                 }
             }
         });

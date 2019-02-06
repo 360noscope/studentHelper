@@ -1,5 +1,19 @@
+<?php 
+if (isset($_COOKIE["STUHELP"])) {
+    session_id($_COOKIE["STUHELP"]);
+    session_start();
+    if (!isset($_SESSION["USER_ID"])) {
+        header("Location: /login");
+    }
+    session_commit();
+} else {
+    session_destroy();
+    header("Location: /login");
+}
+?>
 <!DOCTYPE html>
 <html>
+
 <head>
     <meta charset="utf-8" />
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
@@ -38,7 +52,7 @@
                         <a class="nav-link" href="users.php">ข้อมูลผู้ใช้งาน</a>
                     </li>
                     <li class="nav-item">
-                            <a class="nav-link" href="#">ออกจากระบบ</a>
+                        <a class="nav-link" id="logout" href="#">ออกจากระบบ</a>
                     </li>
                 </ul>
             </div>
@@ -95,6 +109,7 @@
     </section>
     <script src="assets/vendor/jquery/jquery.js"></script>
     <script src="assets/vendor/bootstrap/js/bootstrap.min.js"></script>
+    <script src="assets/js/home.js"></script>
 </body>
 
 </html>

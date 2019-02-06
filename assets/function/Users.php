@@ -1,8 +1,18 @@
 <?php 
 error_reporting(E_ALL);
 ini_set('display_errors', 1);
-session_start();
 include_once("config.php");
+if (isset($_COOKIE["STUHELP"])) {
+    session_id($_COOKIE["STUHELP"]);
+    session_start();
+    if (!isset($_SESSION["USER_ID"])) {
+        header("Location: /login");
+    }
+    session_commit();
+} else {
+    session_destroy();
+    header("Location: /login");
+}
 class Users
 {
     var $mysql_connection;
@@ -28,7 +38,7 @@ class Users
                 } else {
                     $deleteBtn = null;
                 }
-                array_push($result, array($id, $email, $name, null, $deleteBtn));
+                array_push($result, array($id, $name, $email, null, $deleteBtn));
             }
             $stmt->close();
         } catch (Exception $ex) {

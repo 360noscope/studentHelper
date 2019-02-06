@@ -17,7 +17,7 @@ $(document).ready(function () {
                 last: "รายการสุดท้าย"
             }
         },
-        columnDef: [
+        columnDefs: [
             {
                 targets: [0],
                 orderable: false,
@@ -25,12 +25,12 @@ $(document).ready(function () {
                 visible: false
             },
             {
-                targets: [2],
+                targets: [3],
                 className: "text-center",
                 defaultContent: "<button class='btn btn-warning' id='editRecord'>แก้ไข</button>"
             },
             {
-                targets: [3],
+                targets: [4],
                 className: "text-center",
                 defaultContent: "<button class='btn btn-danger' id='deleteRecord'>ลบ</button>"
             }
@@ -44,32 +44,51 @@ $(document).ready(function () {
         }
     });
 
+    $(document).on("click", "#logout", function (e) {
+        e.preventDefault();
+        $.ajax({
+            type: 'POST',
+            url: './assets/function/Authen.php',
+            data: {
+                action: "logout"
+            },
+            success: function (data) {
+                window.location.replace("./login.php");
+            }
+        });
+    });
+
     $(document).on("submit", "#userForm", function (e) {
         e.preventDefault();
-        if ($("#confirmPass").val() !== $("#userPass").val()) {
-            alert("รหัสผ่านทั้งสองช่องไม่เหมือนกันค่ะ");
-        } else {
-            $.ajax({
-                type: 'POST',
-                url: './assets/function/Users.php',
-                data: {
-                    action: "insertUser",
+        var btnType = $("button[type=submit]").val();
+        if (btnType == "newUser") {
+            if ($("#confirmPass").val() !== $("#userPass").val()) {
+                alert("รหัสผ่านทั้งสองช่องไม่เหมือนกันค่ะ");
+            } else {
+                $.ajax({
+                    type: 'POST',
+                    url: './assets/function/Users.php',
                     data: {
-                        email: function () { return $("#userEmail").val() },
-                        name: function () { return $("#name").val() },
-                        password: function () { return $("#userPass").val() },
-                        role: function () { return $("#userRole").val() }
+                        action: "insertUser",
+                        data: {
+                            email: function () { return $("#userEmail").val() },
+                            name: function () { return $("#name").val() },
+                            password: function () { return $("#userPass").val() },
+                            role: function () { return $("#userRole").val() }
+                        }
+                    },
+                    success: function (data) {
+                        var returnData = JSON.parse(data);
+                        if (returnData.hasOwnProperty("userExists")) {
+                            alert("มีการใช้ email นี้แล้ว");
+                        } else {
+                            userTable.ajax.reload();
+                        }
                     }
-                },
-                success: function (data) {
-                    var returnData = JSON.parse(data);
-                    if (returnData.hasOwnProperty("userExists")) {
-                        alert("มีการใช้ email นี้แล้ว");
-                    } else {
-                        userTable.ajax.reload();
-                    }
-                }
-            });
+                });
+            }
+        } else if (btnType == "updateUser") {
+
         }
     });
 });

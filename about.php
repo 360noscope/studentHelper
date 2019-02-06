@@ -38,6 +38,9 @@
                     <li class="nav-item">
                         <a class="nav-link" href="users.php">ข้อมูลผู้ใช้งาน</a>
                     </li>
+                    <li class="nav-item">
+                        <a class="nav-link" id="logout" href="#">ออกจากระบบ</a>
+                    </li>
                 </ul>
             </div>
         </div>
@@ -53,6 +56,7 @@
     </div>
     <script src="assets/vendor/jquery/jquery.js"></script>
     <script src="assets/vendor/bootstrap/js/bootstrap.min.js"></script>
+    <script src="assets/js/about.js"></script>
 </body>
 
 </html>

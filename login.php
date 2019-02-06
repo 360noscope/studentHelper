@@ -41,23 +41,15 @@
                                         type="submit">เข้าสู่ระบบ</button>
                                     <div class="text-center">
                                         <a class="small" href="#">ลืมรหัสผ่าน?</a></div>
+                                    <div class="alert alert-danger" id="wrongpass" style="display: none;" role="alert">
+                                        อีเมลล์หรือรหัสผ่านผิดค่ะ!
+                                    </div>
                                 </form>
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
-        </div>
-    </div>
-    <div class="toast wrongpass" role="alert" aria-live="assertive" aria-atomic="true">
-        <div class="toast-header">
-            <strong class="mr-auto">ระบบช่วยเหลือนักเรียน</strong>
-            <button type="button" class="ml-2 mb-1 close" data-dismiss="toast" aria-label="Close">
-                <span aria-hidden="true">&times;</span>
-            </button>
-        </div>
-        <div class="toast-body">
-            อีเมลล์หรือรหัสผ่านไม่ถูกต้องค่ะ
         </div>
     </div>
     <script src="assets/vendor/jquery/jquery.js"></script>

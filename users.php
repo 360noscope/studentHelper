@@ -1,3 +1,16 @@
+<?php 
+if (isset($_COOKIE["STUHELP"])) {
+    session_id($_COOKIE["STUHELP"]);
+    session_start();
+    if (!isset($_SESSION["USER_ID"])) {
+        header("Location: /login");
+    }
+    session_commit();
+} else {
+    session_destroy();
+    header("Location: /login");
+}
+?>
 <!DOCTYPE html>
 <html>
 
@@ -39,6 +52,9 @@
                     <li class="nav-item active">
                         <a class="nav-link" href="users.php">ข้อมูลผู้ใช้งาน</a>
                     </li>
+                    <li class="nav-item">
+                        <a class="nav-link" id="logout" href="#">ออกจากระบบ</a>
+                    </li>
                 </ul>
             </div>
         </div>
@@ -53,6 +69,7 @@
                 <table id="userTable" class="table table-striped table-bordered">
                     <thead>
                         <tr>
+                            <th></th>
                             <th>ชื่อ</th>
                             <th>อีเมลล์</th>
                             <th></th>
@@ -91,7 +108,7 @@
                             <label>ชื่อ-นามสกุล</label>
                             <input id="name" class="form-control" required>
                         </div>
-                        <button type="submit" class="btn btn-success float-right">บันทึก</button>
+                        <button type="submit" value="newUser" class="btn btn-success float-right">บันทึก</button>
                     </form>
                 </div>
             </div>
