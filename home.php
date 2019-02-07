@@ -8,7 +8,7 @@ if (isset($_COOKIE["STUHELP"])) {
     session_commit();
 } else {
     session_destroy();
-    header("Location: /login");
+    header("Location: login.php");
 }
 ?>
 <!DOCTYPE html>
@@ -43,10 +43,10 @@ if (isset($_COOKIE["STUHELP"])) {
                         <a class="nav-link" href="about.php">ประวัติผู้พัฒนาระบบ</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="#">เช็คชื่อนักเรียน</a>
+                        <a class="nav-link" href="student.php">ข้อมูลนักเรียน</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="#">การรับส่งนักเรียน</a>
+                        <a class="nav-link" href="#">การรับส่ง/เช็คชื่อนักเรียน</a>
                     </li>
                     <li class="nav-item">
                         <a class="nav-link" href="users.php">ข้อมูลผู้ใช้งาน</a>

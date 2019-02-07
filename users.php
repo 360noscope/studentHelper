@@ -22,6 +22,7 @@ if (isset($_COOKIE["STUHELP"])) {
     <link rel="stylesheet" type="text/css" href="assets/vendor/bootstrap/css/bootstrap.min.css" />
     <link rel="stylesheet" type="text/css" media="screen" href="assets/css/about.css" />
     <link rel="stylesheet" type="text/css" href="assets/vendor/datatable/datatables.min.css" />
+    <link rel="stylesheet" type="text/css" href="assets/vendor/jquery-ui/jquery-ui.min.css" />
 </head>
 
 <body>
@@ -44,10 +45,10 @@ if (isset($_COOKIE["STUHELP"])) {
                         <a class="nav-link" href="about.php">ประวัติผู้พัฒนาระบบ</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="#">เช็คชื่อนักเรียน</a>
+                        <a class="nav-link" href="student.php">ข้อมูลนักเรียน</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="#">การรับส่งนักเรียน</a>
+                        <a class="nav-link" href="#">การรับส่ง/เช็คชื่อนักเรียน</a>
                     </li>
                     <li class="nav-item active">
                         <a class="nav-link" href="users.php">ข้อมูลผู้ใช้งาน</a>
@@ -64,7 +65,7 @@ if (isset($_COOKIE["STUHELP"])) {
     <div class="container topper">
         <div class="card border-0 shadow my-5">
             <div class="card-body p-5">
-                <h1 class="font-weight-light">ข้อมูลผู้ใช้งาน</h1>
+                <h1 class="font-weight-light">รายชื่อผู้ใช้งานระบบ</h1>
                 <br>
                 <table id="userTable" class="table table-striped table-bordered">
                     <thead>
@@ -82,7 +83,7 @@ if (isset($_COOKIE["STUHELP"])) {
                 <hr />
                 <div class="col-6">
                     <form id="userForm" method="POST">
-                        <h4>ข้อมูลของผู้ใช้งานระบบ</h4>
+                        <h4 class="font-weight-light">ข้อมูลของผู้ใช้งานระบบ</h4>
                         <div class="form-group">
                             <label>อีเมลล์</label>
                             <input type="email" id="userEmail" placeholder="example@xxx.com" class="form-control"
@@ -99,7 +100,7 @@ if (isset($_COOKIE["STUHELP"])) {
                         </div>
                         <div class="form-group">
                             <label>ประเภทผู้ใช้งาน</label>
-                            <select id="userRole" class="form-control">
+                            <select id="userRole" class="custom-select">
                                 <option value="admin">ผู้ดูแลระบบ</option>
                                 <option value="user">ผู้ใช้งานระบบ</option>
                             </select>
@@ -117,8 +118,8 @@ if (isset($_COOKIE["STUHELP"])) {
     <script src="assets/vendor/jquery/jquery.js"></script>
     <script src="assets/vendor/bootstrap/js/bootstrap.min.js"></script>
     <script type="text/javascript" src="assets/vendor/datatable/datatables.min.js"></script>
+    <script type="text/javascript" src="assets/vendor/jquery-ui/jquery-ui.min.js"></script>
     <script src="assets/js/users.js"></script>
-
 </body>
 
 </html>

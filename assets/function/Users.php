@@ -92,6 +92,73 @@ class Users
         return json_encode($result);
     }
 
+    public function getUserDetail($data)
+    {
+        $result = array();
+        try {
+            $stmt = $this->mysql_connection->prepare("SELECT users.email, users.role, userdetail.name FROM users " .
+                "JOIN userdetail ON users.userId = userdetail.userId WHERE users.userId = ?");
+            $stmt->bind_param("s", $data["id"]);
+            $stmt->execute();
+            $stmt->bind_result($email, $role, $name);
+            while ($stmt->fetch()) {
+                $result["email"] = $email;
+                $result["role"] = $role;
+                $result["name"] = $name;
+            }
+            $stmt->close();
+        } catch (Exception $ex) {
+            $result["error"] = $ex->getMessage();
+        }
+
+        return json_encode($result);
+    }
+
+    public function updateUser($data)
+    {
+        $result = array();
+        try {
+            $stmt = $this->mysql_connection->prepare("UPDATE userdetail SET name = ? WHERE userId = ?");
+            $stmt->bind_param("ss", $data["name"], $data["editingUser"]);
+            $stmt->execute();
+
+            $queryStr = "UPDATE users SET email=?, X WHERE userId = ?";
+            if ($data["emptyPassword"] == "NO"){
+                $hashedPassword = password_hash($data["password"], PASSWORD_DEFAULT);
+                $queryStr = str_replace("X", "password = ?", $queryStr);
+                $stmt = $this->mysql_connection->prepare($queryStr);
+                $stmt->bind_param("sss", $data["email"], $hashedPassword, $data["editingUser"]);
+                $stmt->execute();
+            }else{
+                $queryStr = str_replace("X", "", $queryStr);
+                $stmt = $this->mysql_connection->prepare($queryStr);
+                $stmt->bind_param("ss", $data["email"], $data["editingUser"]);
+                $stmt->execute();
+            }
+            $stmt->close();
+        } catch (Exception $ex) {
+            $result["error"] = $ex->getMessage();
+        }
+        return json_encode($result);
+    }
+
+    public function deleteUser($data){
+        $result = array();
+        try {
+           $stmt = $this->mysql_connection->prepare("DELETE FROM users WHERE userId = ?");
+           $stmt->bind_param("s", $data["id"]);
+           $stmt->execute();
+
+           $stmt = $this->mysql_connection->prepare("DELETE FROM userdetail WHERE userId = ?");
+           $stmt->bind_param("s", $data["id"]);
+           $stmt->execute();
+           $stmt->close();
+        } catch (Exception $ex) {
+            $result["error"] = $ex->getMessage();
+        }
+        return json_encode($result);
+    }
+
     public function __destruct()
     {
         $this->mysql_connection->close();
@@ -104,5 +171,11 @@ if ($requestAction == "listUser") {
     echo $users->listUser();
 } else if ($requestAction == "insertUser") {
     echo $users->newUser($_POST["data"]);
+} else if ($requestAction == "getUserDetail") {
+    echo $users->getUserDetail($_POST["data"]);
+}else if($requestAction == "updateUser"){
+    echo $users->updateUser($_POST["data"]);
+}else if($requestAction == "deleteUser"){
+    echo $users->deleteUser($_POST["data"]);
 }
 ?>

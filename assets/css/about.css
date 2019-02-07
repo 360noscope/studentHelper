@@ -9,6 +9,10 @@ body {
   -o-background-size: cover;
 }
 
+.ui-widget, .ui-widget input, .ui-widget select, .ui-widget textarea, .ui-widget button {
+  font-family: 'Mitr', sans-serif !important;
+}
+
 .topper{
   margin-top: 10%;
 }
