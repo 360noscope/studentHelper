@@ -81,7 +81,26 @@ $(document).ready(function () {
                 }
             });
         } else if (btnType == "updateStudent") {
-
+            $.ajax({
+                type: 'POST',
+                url: './assets/function/Student.php',
+                data: {
+                    action: "updateStudent",
+                    data: {
+                        code: function () { return $("#studentCode").val() },
+                        prefix: function () { return $("#prefixList option:selected").text() },
+                        name: function () { return $("#studentName").val() },
+                        nick: function () { return $("#studentNick").val() },
+                        room: function () { return $("#classroomList").val() }
+                    }
+                },
+                success: function (data) {
+                    listStudent();
+                    $("#studentForm").trigger("reset");
+                    $("#studentForm button[type=submit]").val("newStudent");
+                    $("#studentCode").attr("disabled", false);
+                }
+            });
         }
     });
 
@@ -96,8 +115,47 @@ $(document).ready(function () {
         $("#prefixList").val(cleanse[0]);
         $("#studentName").val(cleanse[1] + " " + cleanse[2]);
         $("#studentNick").val(selectedStudent[2]);
+        $("#studentForm button[type=submit]").val("updateStudent");
+    });
+
+    $(document).on("click", "#deleteRecord", function () {
+        var selectedUser = studentTable.row($(this).parents('tr')).data();
+        var message = "ต้องการจะลบนักเรียนชื่อ <strong>" + selectedUser[1] +
+            "</strong> หรือไม่?";
+        $('<div></div>').appendTo('body')
+            .html('<div><h6>' + message + '?</h6></div>')
+            .dialog({
+                modal: true, title: 'ระบบช่วยเหลือนักเรียน', zIndex: 10000, autoOpen: true,
+                width: 'auto', resizable: false,
+                buttons: {
+                    Yes: function () {
+                        $.ajax({
+                            type: 'POST',
+                            url: './assets/function/Student.php',
+                            data: {
+                                action: "deleteStudent",
+                                data: {
+                                    code: selectedUser[0]
+                                }
+                            },
+                            success: function (data) {
+                                studentTable.ajax.reload();
+                            }
+                        });
+                        $(this).dialog("close");
+                    },
+                    No: function () {
+                        $(this).dialog("close");
+                    }
+                },
+                close: function (event, ui) {
+                    $(this).remove();
+                }
+            });
     });
 });
+
+
 
 function listClass() {
     $.ajax({

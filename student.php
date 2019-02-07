@@ -21,6 +21,7 @@ if (isset($_COOKIE["STUHELP"])) {
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link rel="stylesheet" type="text/css" href="assets/vendor/bootstrap/css/bootstrap.min.css" />
     <link rel="stylesheet" type="text/css" href="assets/vendor/datatable/datatables.min.css" />
+    <link rel="stylesheet" type="text/css" href="assets/vendor/jquery-ui/jquery-ui.min.css" />
     <link rel="stylesheet" type="text/css" media="screen" href="assets/css/about.css" />
 </head>
 
@@ -47,7 +48,7 @@ if (isset($_COOKIE["STUHELP"])) {
                         <a class="nav-link" href="student.php">ข้อมูลนักเรียน</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="#">การรับส่ง/เช็คชื่อนักเรียน</a>
+                        <a class="nav-link" href="timejob.php">การรับส่ง/เช็คชื่อนักเรียน</a>
                     </li>
                     <li class="nav-item">
                         <a class="nav-link" href="users.php">ข้อมูลผู้ใช้งาน</a>
@@ -171,6 +172,7 @@ if (isset($_COOKIE["STUHELP"])) {
     <script src="assets/vendor/jquery/jquery.js"></script>
     <script src="assets/vendor/bootstrap/js/bootstrap.min.js"></script>
     <script type="text/javascript" src="assets/vendor/datatable/datatables.min.js"></script>
+    <script type="text/javascript" src="assets/vendor/jquery-ui/jquery-ui.min.js"></script>
     <script src="assets/js/student.js"></script>
 </body>
 

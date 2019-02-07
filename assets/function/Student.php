@@ -11,7 +11,7 @@ if (isset($_COOKIE["STUHELP"])) {
     session_commit();
 } else {
     session_destroy();
-    header("Location: /login");
+    header("Location: login.php");
 }
 class Student
 {
@@ -101,6 +101,34 @@ class Student
         return json_encode($result);
     }
 
+    public function updateStudent($data)
+    {
+        $result = array();
+        try {
+            $stmt = $this->mysql_connection->prepare("UPDATE student SET prefix = ?, name = ?, nickname = ?, class = ? WHERE studentId = ?");
+            $stmt->bind_param("sssss", $data["prefix"], $data["name"], $data["nick"], $data["room"], $data["code"]);
+            $stmt->execute();
+            $stmt->close();
+        } catch (Exception $ex) {
+            $result["error"] = $ex->getMessage();
+        }
+        return json_encode($result);
+    }
+
+    public function deleteStudent($data)
+    {
+        $result = array();
+        try {
+            $stmt = $this->mysql_connection->prepare("DELETE FROM student WHERE studentId = ?");
+            $stmt->bind_param("s", $data["code"]);
+            $stmt->execute();
+            $stmt->close();
+        } catch (Exception $ex) {
+            $result["error"] = $ex->getMessage();
+        }
+        return json_encode($result);
+    }
+
     public function __destruct()
     {
         $this->mysql_connection->close();
@@ -117,7 +145,11 @@ if ($requestAction == "listClassroom") {
     echo $student->deleteClassroom($_POST["data"]);
 } else if ($requestAction == "listStudent") {
     echo $student->listStudent($_POST["data"]);
-}else if($requestAction == "insertStudent"){
+} else if ($requestAction == "insertStudent") {
     echo $student->insertStudent($_POST["data"]);
+} else if ($requestAction == "updateStudent") {
+    echo $student->updateStudent($_POST["data"]);
+} else if ($requestAction == "deleteStudent") {
+    echo $student->deleteStudent($_POST["data"]);
 }
 ?>

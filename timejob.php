@@ -63,13 +63,13 @@ if (isset($_COOKIE["STUHELP"])) {
     <div class="container topper">
         <div class="card border-0 shadow my-5">
             <div class="card-body p-5">
-                <h1 class="font-weight-light">ประวัติของผู้พัฒนาระบบ</h1>
+                
             </div>
         </div>
     </div>
     <script src="assets/vendor/jquery/jquery.js"></script>
     <script src="assets/vendor/bootstrap/js/bootstrap.min.js"></script>
-    <script src="assets/js/about.js"></script>
+    <script src="assets/js/timejob.js"></script>
 </body>
 
 </html>
