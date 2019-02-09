@@ -16,6 +16,10 @@ $(document).ready(function () {
         });
     });
 
+    $(document).on("change", "#classroomList", function(e){
+        listStudent();
+    });
+
     $(document).on("submit", "#classroomForm", function (e) {
         e.preventDefault();
         $.ajax({

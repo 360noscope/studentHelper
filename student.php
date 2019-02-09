@@ -3,7 +3,7 @@ if (isset($_COOKIE["STUHELP"])) {
     session_id($_COOKIE["STUHELP"]);
     session_start();
     if (!isset($_SESSION["USER_ID"])) {
-        header("Location: /login");
+        header("Location: login.php");
     }
     session_commit();
 } else {
