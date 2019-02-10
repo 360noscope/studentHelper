@@ -22,6 +22,7 @@ if (isset($_COOKIE["STUHELP"])) {
     <link rel="stylesheet" type="text/css" href="assets/vendor/bootstrap/css/bootstrap.min.css" />
     <link rel="stylesheet" type="text/css" href="assets/vendor/datatable/datatables.min.css" />
     <link rel="stylesheet" type="text/css" href="assets/vendor/daterangepicker/daterangepicker.css">
+    <link rel="stylesheet" type="text/css" href="assets/vendor/jquery-ui/jquery-ui.min.css" />
     <link rel="stylesheet" type="text/css" media="screen" href="assets/css/about.css" />
 </head>
 
@@ -90,7 +91,7 @@ if (isset($_COOKIE["STUHELP"])) {
                 </table>
                 <hr>
                 <div class="col-9">
-                    <h3 class="font-weight-light">ข้อมูลตารางเรียน<button class="btn btn-danger ml-4" id="importexcel">นำเข้าข้อมูลจาก Excel</button></h3>
+                    <h3 class="font-weight-light">ข้อมูลตารางเรียน</h3>
                     <form method="POST" id="subjectCellForm">
                         <div class="form-inline">
                             <label>เลือกวันเรียน</label>
@@ -152,34 +153,55 @@ if (isset($_COOKIE["STUHELP"])) {
         </div>
     </div>
 
-    <div class="modal fade" id="uploadExcel" role="dialog">
-            <div class="modal-dialog" role="document">
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <h5 class="modal-title">เลือกไฟล์ Excel</h5>
-                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                            <span aria-hidden="true">&times;</span>
-                        </button>
-                    </div>
-                    <form method="POST" >
-                        <div class="modal-body">
-                            <div class="form-inline">
-                                <input id="fileSelector" class="form-control m-3" required readonly />
-                            </div>
+    <div class="modal fade" id="viewStudent" role="dialog">
+        <div class="modal-dialog modal-xl" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">เช็คชื่อนักเรียน</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <form method="POST" onsubmit="return false;">
+                        <div class="form-inline row ml-2 mb-4">
+                            <label>เลือกวันที่</label>
+                            <input class="form-control ml-2" id="sessionDate" readonly required />
                         </div>
-                        <div class="modal-footer">
-                            <button type="submit" class="btn btn-success">บันทึก</button>
-                            <button type="button" class="btn btn-danger" data-dismiss="modal">ยกเลิก</button>
+                        <div class="form-inline mb-4 row ml-2">
+                            <label>เลือกชื่อนักเรียน</label>
+                            <input class="form-control ml-2 mr-2 col-5" id="studentNameSuggest" required />
+                            <button class="btn btn-info" id="insertStudent">เพิ่มชื่อนักเรียน</button>
                         </div>
                     </form>
+                    <h3 class="font-weight-light mb-4">ข้อมูลรายชื่อนักเรียน</h3>
+                    <table id="studentNameTable" class="table table-striped table-bordered">
+                        <thead>
+                            <tr>
+                                <th class="text-center">เลขประจำตัว</th>
+                                <th class="text-center">ชื่อ-นามสกุล</th>
+                                <th class="text-center">สถานะ</th>
+                                <th></th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                        </tbody>
+                    </table>
+                </div>
+                <div class="modal-footer">
+                    <button type="submit" class="btn btn-success">บันทึก</button>
+                    <button type="button" class="btn btn-danger" data-dismiss="modal">ยกเลิก</button>
                 </div>
             </div>
         </div>
+    </div>
+
     <script src="assets/vendor/jquery/jquery.js"></script>
     <script src="assets/vendor/bootstrap/js/bootstrap.min.js"></script>
     <script type="text/javascript" src="assets/vendor/datatable/datatables.min.js"></script>
     <script src="assets/vendor/daterangepicker/moment.min.js"></script>
     <script src="assets/vendor/daterangepicker/daterangepicker.js"></script>
+    <script type="text/javascript" src="assets/vendor/jquery-ui/jquery-ui.min.js"></script>
     <script src="assets/js/timejob.js"></script>
 </body>
 

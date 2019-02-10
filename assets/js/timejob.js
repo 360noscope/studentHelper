@@ -54,8 +54,8 @@ $(document).ready(function () {
             },
             success: function (data) {
                 var returnData = JSON.parse(data);
-                if(returnData.hasOwnProperty("error")){
-                    if(returnData["error"] == "DUPE"){
+                if (returnData.hasOwnProperty("error")) {
+                    if (returnData["error"] == "DUPE") {
                         alert("คาบเรียนในวันดังกล่าวนั้นไม่ว่างแล้ว");
                     }
                 }
@@ -87,6 +87,47 @@ $(document).ready(function () {
         });
     });
 
+    var cellSelected;
+    $(document).on("click", "#viewStudentList", function (e) {
+        var selectedCell = classTable.row($(this).parents('tr')).data();
+        cellSelected = selectedCell[0];
+        $('#sessionDate').daterangepicker({
+            singleDatePicker: true,
+            linkedCalendars: false,
+            autoUpdateInput: true,
+            locale: {
+                format: 'DD-MM-YYYY'
+            }
+        });
+
+        $("#studentNameSuggest").autocomplete({
+            source: function (request, response) {
+                $.ajax({
+                    url: './assets/function/Student.php',
+                    dataType: "json",
+                    data: {
+                        action: "listStudentName",
+                        data: {
+                            classroom: function () { return $("#classroomList").val() }
+                        }
+                    },
+                    success: function (data, textStatus, jqXHR) {
+                        response(data);
+                    },
+                    error: function (jqXHR, textStatus, errorThrown) {
+                        // Handle errors here 
+                    },
+                    statusCode: {
+                        401: function () {
+                            // Disable autocomplete here
+                        }
+                    }
+                });
+            }
+        });
+        $("#viewStudent").modal("show");
+    });
+
     $(document).on("click", "#logout", function (e) {
         e.preventDefault();
         $.ajax({
@@ -101,7 +142,7 @@ $(document).ready(function () {
         });
     });
 
-    $(document).on("click", "#deleteRecord", function(){
+    $(document).on("click", "#deleteRecord", function () {
         var selectedCell = classTable.row($(this).parents('tr')).data();
         $.ajax({
             type: 'POST',
