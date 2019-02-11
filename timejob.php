@@ -168,19 +168,16 @@ if (isset($_COOKIE["STUHELP"])) {
                             <label>เลือกวันที่</label>
                             <input class="form-control ml-2" id="sessionDate" readonly required />
                         </div>
-                        <div class="form-inline mb-4 row ml-2">
-                            <label>เลือกชื่อนักเรียน</label>
-                            <input class="form-control ml-2 mr-2 col-5" id="studentNameSuggest" required />
-                            <button class="btn btn-info" id="insertStudent">เพิ่มชื่อนักเรียน</button>
-                        </div>
                     </form>
-                    <h3 class="font-weight-light mb-4">ข้อมูลรายชื่อนักเรียน</h3>
-                    <table id="studentNameTable" class="table table-striped table-bordered">
+                    <h3 class="font-weight-light mb-4">ข้อมูลการเข้าเรียน</h3>
+                    <table id="checkStudent" class="table table-striped table-bordered" style="width: 100%">
                         <thead>
                             <tr>
-                                <th class="text-center">เลขประจำตัว</th>
-                                <th class="text-center">ชื่อ-นามสกุล</th>
-                                <th class="text-center">สถานะ</th>
+                                <th class="text-center">รหัสประจำตัว</th>
+                                <th class="text-center">ชื่อ</th>
+                                <th class="text-center">หมายเหตุ</th>
+                                <th></th>
+                                <th></th>
                                 <th></th>
                             </tr>
                         </thead>

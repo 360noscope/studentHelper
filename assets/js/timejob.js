@@ -1,4 +1,4 @@
-var classTable;
+var classTable, studentTable;
 $(document).ready(function () {
 
     listClass();
@@ -100,31 +100,69 @@ $(document).ready(function () {
             }
         });
 
-        $("#studentNameSuggest").autocomplete({
-            source: function (request, response) {
-                $.ajax({
-                    url: './assets/function/Student.php',
-                    dataType: "json",
+
+        if (studentTable != null) {
+            studentTable.ajax.reload();
+        }
+        else {
+            studentTable = $('#checkStudent').DataTable({
+                info: false,
+                processing: true,
+                lengthMenu: [[5, 10, 25, 50, -1], [5, 10, 25, 50, "All"]],
+                language: {
+                    processing: "กำลังโหลดข้อมูล...",
+                    search: "ค้นหา:",
+                    lengthMenu: "จำนวนที่แสดงผล _MENU_ รายการ",
+                    loadingRecords: "กำลังโหลดข้อมูล...",
+                    zeroRecords: "ไม่มีข้อมูลในระบบ",
+                    emptyTable: "ไม่มีข้อมูลในระบบ",
+                    paginate: {
+                        first: "รายการแรก",
+                        previous: "ก่อนหน้า",
+                        next: "ถัดไป",
+                        last: "รายการสุดท้าย"
+                    }
+                },
+                columnDefs: [
+                    {
+                        targets: [0],
+                        className: "text-center",
+                        orderable: false,
+                        searchable: false,
+                        visible: false
+                    },
+                    {
+                        targets: [1],
+                        className: "text-center"
+                    },
+                    {
+                        targets: [2],
+                        className: "text-center"
+                    },
+                    {
+                        targets: [3],
+                        className: "text-center",
+                        defaultContent: "<button class='btn btn-success' id='present'>นักเรียนมา</button>"
+                    },
+                    {
+                        targets: [4],
+                        className: "text-center",
+                        defaultContent: "<button class='btn btn-danger' id='notPresent'>นักเรียนไม่มา</button>"
+                    }
+                ],
+                ajax: {
+                    url: "./assets/function/Timejob.php",
+                    type: "POST",
                     data: {
-                        action: "listStudentName",
+                        action: "listStudentSession",
                         data: {
-                            classroom: function () { return $("#classroomList").val() }
-                        }
-                    },
-                    success: function (data, textStatus, jqXHR) {
-                        response(data);
-                    },
-                    error: function (jqXHR, textStatus, errorThrown) {
-                        // Handle errors here 
-                    },
-                    statusCode: {
-                        401: function () {
-                            // Disable autocomplete here
+                            selectedTime: cellSelected,
+                            cell: cellSelected
                         }
                     }
-                });
-            }
-        });
+                }
+            });
+        }
         $("#viewStudent").modal("show");
     });
 
@@ -259,7 +297,7 @@ function listSection() {
                 {
                     targets: [5],
                     className: "text-center",
-                    defaultContent: "<button class='btn btn-warning' id='viewStudentList'>ดูรายชื่อนักเรียน</button>"
+                    defaultContent: "<button class='btn btn-warning' id='viewStudentList'>เช็คชื่อ</button>"
                 }
             ],
             ajax: {

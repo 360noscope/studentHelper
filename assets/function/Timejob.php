@@ -60,6 +60,31 @@ class Timejob
         return json_encode($result);
     }
 
+    public function listStudentsession($data)
+    {
+        $result = array();
+        try {
+            $stmt = $this->mysql_connection->prepare("SELECT student.student");
+            $stmt->bind_param("ss", $data["selectedTime"], $data["cell"]);
+            $stmt->execute();
+            $stmt->bind_result($id, $prefix, $name, $ispresent, $reason, $sessId);
+            while ($stmt->fetch()) {
+                $presentBtn = null;
+                $notPresentBtn = null;
+                if ($ispresent == "YES") {
+                    $presentBtn = "";
+                } else {
+                    $notPresentBtn = "";
+                }
+                array_push($result, array($id, $prefix . " " . $name, $reason, $sessId, $notPresentBtn, $presentBtn));
+            }
+            $stmt->close();
+        } catch (Exception $ex) {
+            $result["error"] = $ex->getMessage();
+        }
+        return json_encode(array("data" => $result));
+    }
+
     public function listTime()
     {
         $result = array();
@@ -155,5 +180,7 @@ if ($requestAction == "listSection") {
     echo $timer->deleteTime($_POST["data"]);
 } else if ($requestAction == "deleteSubjectCell") {
     echo $timer->deleteSubjectCell($_POST["data"]);
+} else if ($requestAction == "listStudentSession") {
+    echo $timer->listStudentSession($_POST["data"]);
 }
 ?>
