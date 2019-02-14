@@ -86,23 +86,6 @@ class Student
         return json_encode(array("data" => $result));
     }
 
-    public function listStudentName($data)
-    {
-        $result = array();
-        try {
-            $stmt = $this->mysql_connection->prepare("SELECT studentId, name, prefix FROM student WHERE class =?");
-            $stmt->bind_param("s", $data["classroom"]);
-            $stmt->execute();
-            $stmt->bind_result($id, $name, $prefix);
-            while ($stmt->fetch()) {
-                array_push($result, array("value" => $id, "label" => $prefix . " " . $name));
-            }
-            $stmt->close();
-        } catch (Exception $ex) {
-            $result["error"] = $ex->getMessage();
-        }
-        return json_encode($result);
-    }
 
     public function insertStudent($data)
     {
@@ -169,7 +152,5 @@ if ($requestAction == "listClassroom") {
     echo $student->updateStudent($_POST["data"]);
 } else if ($requestAction == "deleteStudent") {
     echo $student->deleteStudent($_POST["data"]);
-} else if ($requestAction == "listStudentName") {
-    echo $student->listStudentName($_POST["data"]);
-}
+} 
 ?>

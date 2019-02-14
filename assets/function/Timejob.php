@@ -60,29 +60,65 @@ class Timejob
         return json_encode($result);
     }
 
-    public function listStudentsession($data)
+    public function listAbsentName($data)
     {
         $result = array();
         try {
-            $stmt = $this->mysql_connection->prepare("SELECT student.student");
-            $stmt->bind_param("ss", $data["selectedTime"], $data["cell"]);
+            $stmt = $this->mysql_connection->prepare("SELECT t1.studentId, t1.name, t1.prefix " .
+                "FROM student as t1 LEFT JOIN studentsess as t2 " .
+                "ON t1.studentId = t2.studentId WHERE (t2.date != ? OR t2.date IS NULL) AND t1.class = ? AND t2.section != ?");
+            $stmt->bind_param("sss", $data["date"], $data["classroom"], $data["cell"]);
             $stmt->execute();
-            $stmt->bind_result($id, $prefix, $name, $ispresent, $reason, $sessId);
+            $stmt->bind_result($id, $name, $prefix);
             while ($stmt->fetch()) {
-                $presentBtn = null;
-                $notPresentBtn = null;
-                if ($ispresent == "YES") {
-                    $presentBtn = "";
-                } else {
-                    $notPresentBtn = "";
-                }
-                array_push($result, array($id, $prefix . " " . $name, $reason, $sessId, $notPresentBtn, $presentBtn));
+                array_push($result, array($id, ($prefix . " " . $name)));
             }
             $stmt->close();
         } catch (Exception $ex) {
             $result["error"] = $ex->getMessage();
         }
         return json_encode(array("data" => $result));
+    }
+
+    public function listPresentName($data)
+    {
+        $result = array();
+        try {
+            $stmt = $this->mysql_connection->prepare("SELECT t1.studentId, t1.name, t1.prefix " .
+                "FROM student as t1 LEFT JOIN studentsess as t2 " .
+                "ON t1.studentId = t2.studentId WHERE t2.studentId IS NOT NULL AND t2.date = ? AND t1.class = ?");
+            $stmt->bind_param("ss", $data["date"], $data["classroom"]);
+            $stmt->execute();
+            $stmt->bind_result($id, $name, $prefix);
+            while ($stmt->fetch()) {
+                array_push($result, array($id, ($prefix . " " . $name)));
+            }
+            $stmt->close();
+        } catch (Exception $ex) {
+            $result["error"] = $ex->getMessage();
+        }
+        return json_encode(array("data" => $result));
+    }
+
+    public function studentCheckin($data)
+    {
+        $result = array();
+        try {
+            $stmt = $this->mysql_connection->prepare("DELETE FROM studentsess WHERE section = ? AND date = ?");
+            $stmt->bind_param("ss", $data["cell"], $data["date"]);
+            $stmt->execute();
+            $stmt = $this->mysql_connection->prepare("ALTER TABLE studentsess AUTO_INCREMENT = 1");
+            $stmt->execute();
+            $stmt = $this->mysql_connection->prepare("INSERT INTO studentsess (section, studentId, date) VALUE(?, ?, ?)");
+            foreach ($data["studentPresentList"] as $student1) {
+                $stmt->bind_param("sss", $data["cell"], $student1[0], $data["date"]);
+                $stmt->execute();
+            }
+            $stmt->close();
+        } catch (Exception $ex) {
+            $result["error"] = $ex->getMessage();
+        }
+        return json_encode($result);
     }
 
     public function listTime()
@@ -178,9 +214,13 @@ if ($requestAction == "listSection") {
     echo $timer->insertSubjectCell($_POST["data"]);
 } else if ($requestAction == "deleteSection") {
     echo $timer->deleteTime($_POST["data"]);
-} else if ($requestAction == "deleteSubjectCell") {
-    echo $timer->deleteSubjectCell($_POST["data"]);
 } else if ($requestAction == "listStudentSession") {
     echo $timer->listStudentSession($_POST["data"]);
+} else if ($requestAction == "listAbsentName") {
+    echo $timer->listAbsentName($_POST["data"]);
+} else if ($requestAction == "listPresentName") {
+    echo $timer->listPresentName($_POST["data"]);
+} else if ($requestAction == "checkinStudent") {
+    echo $timer->studentCheckin($_POST["data"]);
 }
 ?>

@@ -22,8 +22,13 @@ if (isset($_COOKIE["STUHELP"])) {
     <link rel="stylesheet" type="text/css" href="assets/vendor/bootstrap/css/bootstrap.min.css" />
     <link rel="stylesheet" type="text/css" href="assets/vendor/datatable/datatables.min.css" />
     <link rel="stylesheet" type="text/css" href="assets/vendor/daterangepicker/daterangepicker.css">
-    <link rel="stylesheet" type="text/css" href="assets/vendor/jquery-ui/jquery-ui.min.css" />
     <link rel="stylesheet" type="text/css" media="screen" href="assets/css/about.css" />
+    <script src="assets/vendor/jquery/jquery.js"></script>
+    <script src="assets/vendor/bootstrap/js/bootstrap.min.js"></script>
+    <script type="text/javascript" src="assets/vendor/datatable/datatables.min.js"></script>
+    <script src="assets/vendor/daterangepicker/moment.min.js"></script>
+    <script src="assets/vendor/daterangepicker/daterangepicker.js"></script>
+    <script src="assets/js/timejob.js"></script>
 </head>
 
 <body>
@@ -163,43 +168,44 @@ if (isset($_COOKIE["STUHELP"])) {
                     </button>
                 </div>
                 <div class="modal-body">
-                    <form method="POST" onsubmit="return false;">
+                    <form method="POST" id="studentCheckForm">
                         <div class="form-inline row ml-2 mb-4">
                             <label>เลือกวันที่</label>
                             <input class="form-control ml-2" id="sessionDate" readonly required />
                         </div>
-                    </form>
-                    <h3 class="font-weight-light mb-4">ข้อมูลการเข้าเรียน</h3>
-                    <table id="checkStudent" class="table table-striped table-bordered" style="width: 100%">
-                        <thead>
-                            <tr>
-                                <th class="text-center">รหัสประจำตัว</th>
-                                <th class="text-center">ชื่อ</th>
-                                <th class="text-center">หมายเหตุ</th>
-                                <th></th>
-                                <th></th>
-                                <th></th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                        </tbody>
-                    </table>
+                        <h3 class="font-weight-light mb-4">นักเรียนที่ไม่เข้าเรียน</h3>
+                        <table id="absentStudentTable" class="table table-striped table-bordered" style="width: 100%">
+                            <thead>
+                                <tr>
+                                    <th class="text-center">รหัสประจำตัว</th>
+                                    <th class="text-center">ชื่อ</th>
+                                    <th></th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                            </tbody>
+                        </table>
+                        <h3 class="font-weight-light mb-4">นักเรียนที่เข้าเรียน</h3>
+                        <table id="presentStudent" class="table table-striped table-bordered" style="width: 100%">
+                            <thead>
+                                <tr>
+                                    <th class="text-center">รหัสประจำตัว</th>
+                                    <th class="text-center">ชื่อ</th>
+                                    <th></th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                            </tbody>
+                        </table>
                 </div>
                 <div class="modal-footer">
                     <button type="submit" class="btn btn-success">บันทึก</button>
                     <button type="button" class="btn btn-danger" data-dismiss="modal">ยกเลิก</button>
                 </div>
+                </form>
             </div>
         </div>
     </div>
-
-    <script src="assets/vendor/jquery/jquery.js"></script>
-    <script src="assets/vendor/bootstrap/js/bootstrap.min.js"></script>
-    <script type="text/javascript" src="assets/vendor/datatable/datatables.min.js"></script>
-    <script src="assets/vendor/daterangepicker/moment.min.js"></script>
-    <script src="assets/vendor/daterangepicker/daterangepicker.js"></script>
-    <script type="text/javascript" src="assets/vendor/jquery-ui/jquery-ui.min.js"></script>
-    <script src="assets/js/timejob.js"></script>
 </body>
 
 </html>

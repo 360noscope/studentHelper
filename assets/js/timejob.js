@@ -1,4 +1,4 @@
-var classTable, studentTable;
+var classTable, absentTable, presentTable, cellSelected;
 $(document).ready(function () {
 
     listClass();
@@ -87,7 +87,6 @@ $(document).ready(function () {
         });
     });
 
-    var cellSelected;
     $(document).on("click", "#viewStudentList", function (e) {
         var selectedCell = classTable.row($(this).parents('tr')).data();
         cellSelected = selectedCell[0];
@@ -98,72 +97,52 @@ $(document).ready(function () {
             locale: {
                 format: 'DD-MM-YYYY'
             }
+        }).on('apply.daterangepicker', function (ev, picker) {
+            listStudentSchedule();
+        });
+        listStudentSchedule();
+        $("#viewStudent").modal("show");
+    });
+
+    $(document).on("submit", "#studentCheckForm", function (e) {
+        e.preventDefault();
+        var presentList = [];
+        presentTable.rows().every(function (rowIdx, tableLoop, rowLoop) {
+            var stuData = this.data();
+            presentList.push(stuData);
         });
 
-
-        if (studentTable != null) {
-            studentTable.ajax.reload();
-        }
-        else {
-            studentTable = $('#checkStudent').DataTable({
-                info: false,
-                processing: true,
-                lengthMenu: [[5, 10, 25, 50, -1], [5, 10, 25, 50, "All"]],
-                language: {
-                    processing: "กำลังโหลดข้อมูล...",
-                    search: "ค้นหา:",
-                    lengthMenu: "จำนวนที่แสดงผล _MENU_ รายการ",
-                    loadingRecords: "กำลังโหลดข้อมูล...",
-                    zeroRecords: "ไม่มีข้อมูลในระบบ",
-                    emptyTable: "ไม่มีข้อมูลในระบบ",
-                    paginate: {
-                        first: "รายการแรก",
-                        previous: "ก่อนหน้า",
-                        next: "ถัดไป",
-                        last: "รายการสุดท้าย"
-                    }
-                },
-                columnDefs: [
-                    {
-                        targets: [0],
-                        className: "text-center",
-                        orderable: false,
-                        searchable: false,
-                        visible: false
-                    },
-                    {
-                        targets: [1],
-                        className: "text-center"
-                    },
-                    {
-                        targets: [2],
-                        className: "text-center"
-                    },
-                    {
-                        targets: [3],
-                        className: "text-center",
-                        defaultContent: "<button class='btn btn-success' id='present'>นักเรียนมา</button>"
-                    },
-                    {
-                        targets: [4],
-                        className: "text-center",
-                        defaultContent: "<button class='btn btn-danger' id='notPresent'>นักเรียนไม่มา</button>"
-                    }
-                ],
-                ajax: {
-                    url: "./assets/function/Timejob.php",
-                    type: "POST",
-                    data: {
-                        action: "listStudentSession",
-                        data: {
-                            selectedTime: cellSelected,
-                            cell: cellSelected
-                        }
-                    }
+        $.ajax({
+            type: 'POST',
+            url: './assets/function/Timejob.php',
+            data: {
+                action: "checkinStudent",
+                data: {
+                    studentPresentList: presentList,
+                    cell: cellSelected,
+                    date: function () { return $("#sessionDate").val() }
                 }
-            });
-        }
-        $("#viewStudent").modal("show");
+            },
+            success: function (data) {
+                $("#viewStudent").modal("hide");
+            }
+        });
+    });
+
+    $(document).on("click", "#present", function () {
+        var selectedStu = absentTable.row($(this).parents('tr')).data();
+        presentTable.row.add([selectedStu[0], selectedStu[1]]).draw(false);
+        absentTable.row($(this).parents('tr'))
+            .remove()
+            .draw();
+    });
+
+    $(document).on("click", "#absent", function () {
+        var selectedStu = presentTable.row($(this).parents('tr')).data();
+        absentTable.row.add([selectedStu[0], selectedStu[1]]).draw(false);
+        presentTable.row($(this).parents('tr'))
+            .remove()
+            .draw();
     });
 
     $(document).on("click", "#logout", function (e) {
@@ -202,6 +181,107 @@ $(document).ready(function () {
         listSection();
     });
 });
+
+function listStudentSchedule() {
+    if (absentTable != null || presentTable != null) {
+        absentTable.ajax.reload();
+        presentTable.ajax.reload();
+    }
+    else {
+        absentTable = $('#absentStudentTable').DataTable({
+            info: false,
+            processing: true,
+            lengthMenu: [[5, 10, 25, 50, -1], [5, 10, 25, 50, "All"]],
+            language: {
+                processing: "กำลังโหลดข้อมูล...",
+                search: "ค้นหา:",
+                lengthMenu: "จำนวนที่แสดงผล _MENU_ รายการ",
+                loadingRecords: "กำลังโหลดข้อมูล...",
+                zeroRecords: "ไม่มีข้อมูลในระบบ",
+                emptyTable: "ไม่มีข้อมูลในระบบ",
+                paginate: {
+                    first: "รายการแรก",
+                    previous: "ก่อนหน้า",
+                    next: "ถัดไป",
+                    last: "รายการสุดท้าย"
+                }
+            },
+            columnDefs: [
+                {
+                    targets: [0],
+                    className: "text-center"
+                },
+                {
+                    targets: [1],
+                    className: "text-center"
+                },
+                {
+                    targets: [2],
+                    className: "text-center",
+                    defaultContent: "<button class='btn btn-success' id='present'>เลือก</button>"
+                }
+            ],
+            ajax: {
+                url: "./assets/function/Timejob.php",
+                type: "POST",
+                data: {
+                    action: "listAbsentName",
+                    data: {
+                        classroom: function () { return $("#classroomList").val() },
+                        date: function () { return $("#sessionDate").val() },
+                        cell: cellSelected
+                    }
+                }
+            }
+        });
+
+        presentTable = $('#presentStudent').DataTable({
+            info: false,
+            processing: true,
+            lengthMenu: [[5, 10, 25, 50, -1], [5, 10, 25, 50, "All"]],
+            language: {
+                processing: "กำลังโหลดข้อมูล...",
+                search: "ค้นหา:",
+                lengthMenu: "จำนวนที่แสดงผล _MENU_ รายการ",
+                loadingRecords: "กำลังโหลดข้อมูล...",
+                zeroRecords: "ไม่มีข้อมูลในระบบ",
+                emptyTable: "ไม่มีข้อมูลในระบบ",
+                paginate: {
+                    first: "รายการแรก",
+                    previous: "ก่อนหน้า",
+                    next: "ถัดไป",
+                    last: "รายการสุดท้าย"
+                }
+            },
+            columnDefs: [
+                {
+                    targets: [0],
+                    className: "text-center"
+                },
+                {
+                    targets: [1],
+                    className: "text-center"
+                },
+                {
+                    targets: [2],
+                    className: "text-center",
+                    defaultContent: "<button class='btn btn-warning' id='absent'>เลือก</button>"
+                }
+            ],
+            ajax: {
+                url: "./assets/function/Timejob.php",
+                type: "POST",
+                data: {
+                    action: "listPresentName",
+                    data: {
+                        classroom: function () { return $("#classroomList").val() },
+                        date: function () { return $("#sessionDate").val() }
+                    }
+                }
+            }
+        });
+    }
+}
 
 function listTime() {
     $.ajax({
