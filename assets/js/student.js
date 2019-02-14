@@ -16,7 +16,7 @@ $(document).ready(function () {
         });
     });
 
-    $(document).on("change", "#classroomList", function(e){
+    $(document).on("change", "#classroomList", function (e) {
         listStudent();
     });
 
@@ -117,7 +117,11 @@ $(document).ready(function () {
         $("#studentCode").attr("disabled", true);
         $("#studentCode").val(selectedStudent[0]);
         $("#prefixList").val(cleanse[0]);
-        $("#studentName").val(cleanse[1] + " " + cleanse[2]);
+        if (cleanse[2] == null) {
+            $("#studentName").val(cleanse[1]);
+        } else {
+            $("#studentName").val(cleanse[1] + " " + cleanse[2]);
+        }
         $("#studentNick").val(selectedStudent[2]);
         $("#studentForm button[type=submit]").val("updateStudent");
     });

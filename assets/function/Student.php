@@ -1,7 +1,6 @@
 <?php 
 error_reporting(E_ALL);
 ini_set('display_errors', 1);
-include_once("config.php");
 if (isset($_COOKIE["STUHELP"])) {
     session_id($_COOKIE["STUHELP"]);
     session_start();
@@ -13,27 +12,25 @@ if (isset($_COOKIE["STUHELP"])) {
     session_destroy();
     header("Location: login.php");
 }
+include_once("config.php");
+
 class Student
 {
-    var $mysql_connection;
+    var $database;
     public function __construct()
     {
-        mysqli_report(MYSQLI_REPORT_ERROR | MYSQLI_REPORT_STRICT);
-        $this->mysql_connection = new mysqli(DB_HOST, DB_USERNANE, DB_PASS, DB_SCHEM);
-        $this->mysql_connection->set_charset("utf8");
+        global $database;
+        $this->database = $database;
     }
 
     public function listClassroom()
     {
         $result = array();
         try {
-            $stmt = $this->mysql_connection->prepare("SELECT classroomId, name FROM classroom");
-            $stmt->execute();
-            $stmt->bind_result($id, $name);
-            while ($stmt->fetch()) {
-                array_push($result, array("name" => $name, "id" => $id));
+            $queryResult = $this->database->select("classroom", array("classroomId", "name"));
+            foreach ($queryResult as $classroom) {
+                array_push($result, array("id" => $classroom["classroomId"], "name" => $classroom["name"]));
             }
-            $stmt->close();
         } catch (Exception $ex) {
             $result["error"] = $ex->getMessage();
         }
@@ -44,10 +41,7 @@ class Student
     {
         $result = array();
         try {
-            $stmt = $this->mysql_connection->prepare("INSERT INTO classroom (name) VALUES(?)");
-            $stmt->bind_param("s", $data["name"]);
-            $stmt->execute();
-            $stmt->close();
+            $this->database->insert("classroom", array("name" => $data["name"]));
         } catch (Exception $ex) {
             $result["error"] = $ex->getMessage();
         }
@@ -58,10 +52,7 @@ class Student
     {
         $result = array();
         try {
-            $stmt = $this->mysql_connection->prepare("DELETE FROM classroom WHERE classroomId = ?");
-            $stmt->bind_param("s", $data["id"]);
-            $stmt->execute();
-            $stmt->close();
+            $this->database->delete("classroom", array("classroomId" => $data["id"]));
         } catch (Exception $ex) {
             $result["error"] = $ex->getMessage();
         }
@@ -72,14 +63,21 @@ class Student
     {
         $result = array();
         try {
-            $stmt = $this->mysql_connection->prepare("SELECT studentId, name, prefix, nickname FROM student WHERE class =?");
-            $stmt->bind_param("s", $data["classroom"]);
-            $stmt->execute();
-            $stmt->bind_result($id, $name, $prefix, $nickname);
-            while ($stmt->fetch()) {
-                array_push($result, array($id, $prefix . " " . $name, $nickname));
+            $queryResult = $this->database->select(
+                "student",
+                array("studentId", "name", "prefix", "nickname"),
+                array("class" => $data["classroom"])
+            );
+            foreach ($queryResult as $student) {
+                array_push(
+                    $result,
+                    array(
+                        $student["studentId"],
+                        $student["prefix"] . " " . $student["name"],
+                        $student["nickname"]
+                    )
+                );
             }
-            $stmt->close();
         } catch (Exception $ex) {
             $result["error"] = $ex->getMessage();
         }
@@ -91,11 +89,16 @@ class Student
     {
         $result = array();
         try {
-            $stmt = $this->mysql_connection->prepare("INSERT INTO student (studentId, prefix, name, nickname, class) " .
-                "VALUES(?, ?, ?, ?, ?)");
-            $stmt->bind_param("sssss", $data["code"], $data["prefix"], $data["name"], $data["nick"], $data["room"]);
-            $stmt->execute();
-            $stmt->close();
+            $this->database->insert(
+                "student",
+                array(
+                    "studentId" => $data["code"],
+                    "prefix" => $data["prefix"],
+                    "name" => $data["name"],
+                    "nickname" => $data["nick"],
+                    "class" => $data["room"]
+                )
+            );
         } catch (Exception $ex) {
             $result["error"] = $ex->getMessage();
         }
@@ -106,10 +109,16 @@ class Student
     {
         $result = array();
         try {
-            $stmt = $this->mysql_connection->prepare("UPDATE student SET prefix = ?, name = ?, nickname = ?, class = ? WHERE studentId = ?");
-            $stmt->bind_param("sssss", $data["prefix"], $data["name"], $data["nick"], $data["room"], $data["code"]);
-            $stmt->execute();
-            $stmt->close();
+            $this->database->update(
+                "student",
+                array(
+                    "prefix" => $data["prefix"],
+                    "name" => $data["name"],
+                    "nickname" => $data["nick"],
+                    "class" => $data["room"]
+                ),
+                array("studentId" => $data["code"])
+            );
         } catch (Exception $ex) {
             $result["error"] = $ex->getMessage();
         }
@@ -120,19 +129,11 @@ class Student
     {
         $result = array();
         try {
-            $stmt = $this->mysql_connection->prepare("DELETE FROM student WHERE studentId = ?");
-            $stmt->bind_param("s", $data["code"]);
-            $stmt->execute();
-            $stmt->close();
+            $this->database->delete("student", array("studentId" => $data["code"]));
         } catch (Exception $ex) {
             $result["error"] = $ex->getMessage();
         }
         return json_encode($result);
-    }
-
-    public function __destruct()
-    {
-        $this->mysql_connection->close();
     }
 }
 
@@ -152,5 +153,5 @@ if ($requestAction == "listClassroom") {
     echo $student->updateStudent($_POST["data"]);
 } else if ($requestAction == "deleteStudent") {
     echo $student->deleteStudent($_POST["data"]);
-} 
+}
 ?>

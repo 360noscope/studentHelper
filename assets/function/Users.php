@@ -6,18 +6,20 @@ if (isset($_COOKIE["STUHELP"])) {
     session_id($_COOKIE["STUHELP"]);
     session_start();
     if (!isset($_SESSION["USER_ID"])) {
-        header("Location: /login");
+        header("Location: login.php");
     }
     session_commit();
 } else {
     session_destroy();
-    header("Location: /login");
+    header("Location: login.php");
 }
 class Users
 {
-    var $mysql_connection;
+    var $mysql_connection, $database;
     public function __construct()
     {
+        global $database;
+        $this->database = $database;
         mysqli_report(MYSQLI_REPORT_ERROR | MYSQLI_REPORT_STRICT);
         $this->mysql_connection = new mysqli(DB_HOST, DB_USERNANE, DB_PASS, DB_SCHEM);
         $this->mysql_connection->set_charset("utf8");
@@ -27,20 +29,28 @@ class Users
     {
         $result = array();
         try {
-            $stmt = $this->mysql_connection->prepare("SELECT users.userId, users.email, userdetail.name FROM users " .
-                "JOIN userdetail ON users.userId = userdetail.userId");
-            $stmt->execute();
-            $stmt->bind_result($id, $email, $name);
-            $deleteBtn = null;
-            while ($stmt->fetch()) {
-                if ($id == $_SESSION["USER_ID"]) {
+            $queryResult = $this->database->select(
+                "users",
+                array("[<]userdetail" => array("userId" => "userId")),
+                array("users.userId", "users.email", "userdetail.name")
+            );
+            foreach ($queryResult as $student) {
+                if ($student["userId"] == $_SESSION["USER_ID"]) {
                     $deleteBtn = "";
                 } else {
                     $deleteBtn = null;
                 }
-                array_push($result, array($id, $name, $email, null, $deleteBtn));
+                array_push(
+                    $result,
+                    array(
+                        $student["userId"],
+                        $student["name"],
+                        $student["email"],
+                        null,
+                        $deleteBtn
+                    )
+                );
             }
-            $stmt->close();
         } catch (Exception $ex) {
             $result["error"] = $ex->getMessage();
         }
@@ -123,13 +133,13 @@ class Users
             $stmt->execute();
 
             $queryStr = "UPDATE users SET email=?, X WHERE userId = ?";
-            if ($data["emptyPassword"] == "NO"){
+            if ($data["emptyPassword"] == "NO") {
                 $hashedPassword = password_hash($data["password"], PASSWORD_DEFAULT);
                 $queryStr = str_replace("X", "password = ?", $queryStr);
                 $stmt = $this->mysql_connection->prepare($queryStr);
                 $stmt->bind_param("sss", $data["email"], $hashedPassword, $data["editingUser"]);
                 $stmt->execute();
-            }else{
+            } else {
                 $queryStr = str_replace("X", "", $queryStr);
                 $stmt = $this->mysql_connection->prepare($queryStr);
                 $stmt->bind_param("ss", $data["email"], $data["editingUser"]);
@@ -142,17 +152,18 @@ class Users
         return json_encode($result);
     }
 
-    public function deleteUser($data){
+    public function deleteUser($data)
+    {
         $result = array();
         try {
-           $stmt = $this->mysql_connection->prepare("DELETE FROM users WHERE userId = ?");
-           $stmt->bind_param("s", $data["id"]);
-           $stmt->execute();
+            $stmt = $this->mysql_connection->prepare("DELETE FROM users WHERE userId = ?");
+            $stmt->bind_param("s", $data["id"]);
+            $stmt->execute();
 
-           $stmt = $this->mysql_connection->prepare("DELETE FROM userdetail WHERE userId = ?");
-           $stmt->bind_param("s", $data["id"]);
-           $stmt->execute();
-           $stmt->close();
+            $stmt = $this->mysql_connection->prepare("DELETE FROM userdetail WHERE userId = ?");
+            $stmt->bind_param("s", $data["id"]);
+            $stmt->execute();
+            $stmt->close();
         } catch (Exception $ex) {
             $result["error"] = $ex->getMessage();
         }
@@ -173,9 +184,9 @@ if ($requestAction == "listUser") {
     echo $users->newUser($_POST["data"]);
 } else if ($requestAction == "getUserDetail") {
     echo $users->getUserDetail($_POST["data"]);
-}else if($requestAction == "updateUser"){
+} else if ($requestAction == "updateUser") {
     echo $users->updateUser($_POST["data"]);
-}else if($requestAction == "deleteUser"){
+} else if ($requestAction == "deleteUser") {
     echo $users->deleteUser($_POST["data"]);
 }
 ?>
