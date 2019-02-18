@@ -227,7 +227,6 @@ function listStudentSchedule() {
                 data: {
                     action: "listAbsentName",
                     data: {
-                        classroom: function () { return $("#classroomList").val() },
                         date: function () { return $("#sessionDate").val() },
                         cell: cellSelected
                     }
@@ -274,7 +273,7 @@ function listStudentSchedule() {
                 data: {
                     action: "listPresentName",
                     data: {
-                        classroom: function () { return $("#classroomList").val() },
+                        cell: cellSelected,
                         date: function () { return $("#sessionDate").val() }
                     }
                 }

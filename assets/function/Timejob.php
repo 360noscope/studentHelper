@@ -15,9 +15,11 @@ ini_set('display_errors', 1);
 include_once("config.php");
 class Timejob
 {
-    var $mysql_connection;
+    var $mysql_connection, $database;
     public function __construct()
     {
+        global $database;
+        $this->database = $database;
         mysqli_report(MYSQLI_REPORT_ERROR | MYSQLI_REPORT_STRICT);
         $this->mysql_connection = new mysqli(DB_HOST, DB_USERNANE, DB_PASS, DB_SCHEM);
         $this->mysql_connection->set_charset("utf8");
@@ -27,16 +29,25 @@ class Timejob
     {
         $result = array();
         try {
-            $stmt = $this->mysql_connection->prepare("SELECT sectiontable.sectionId, timetable.time, " .
-                "sectiontable.subject, sectiontable.day FROM sectiontable " .
-                "JOIN timetable ON sectiontable.time = timetable.timeId WHERE sectiontable.class = ?");
-            $stmt->bind_param("s", $data["classroom"]);
-            $stmt->execute();
-            $stmt->bind_result($id, $time, $subject, $day);
-            while ($stmt->fetch()) {
-                array_push($result, array($id, $subject, $day, $time));
+            $queryResult = $this->database->select(
+                "sectiontable",
+                array(
+                    "[>]timetable" => array("time" => "timeId")
+                ),
+                array("sectiontable.sectionId", "timetable.time", "sectiontable.subject", "sectiontable.day"),
+                array("sectiontable.class" => $data["classroom"])
+            );
+            foreach ($queryResult as $section) {
+                array_push(
+                    $result,
+                    array(
+                        $section["sectionId"],
+                        $section["subject"],
+                        $section["day"],
+                        $section["time"]
+                    )
+                );
             }
-            $stmt->close();
         } catch (Exception $ex) {
             $result['error'] = $ex->getMessage();
         }
@@ -47,12 +58,13 @@ class Timejob
     {
         $result = array();
         try {
-            $stmt = $this->mysql_connection->prepare("DELETE FROM timetable WHERE timeId = ?");
-            $stmt->bind_param("s", $data["time"]);
-            $stmt->execute();
-            $stmt = $this->mysql_connection->prepare("ALTER TABLE timetable AUTO_INCREMENT = 1");
-            $stmt->execute();
-            $stmt->close();
+            $this->database->delete("timetable", array("timeId" => $data["time"]));
+            $checkError = $this->database->error();
+            if (count($checkError) > 1) {
+                throw new Exception($checkError[2], $checkError[1]);
+            } else {
+                $this->database->query("ALTER TABLE timetable AUTO_INCREMENT = 1");
+            }
         } catch (Exception $ex) {
             $result['error'] = $ex->getMessage();
             $result['errorCode'] = $ex->getCode();
@@ -64,16 +76,30 @@ class Timejob
     {
         $result = array();
         try {
-            $stmt = $this->mysql_connection->prepare("SELECT t1.studentId, t1.name, t1.prefix " .
-                "FROM student as t1 LEFT JOIN studentsess as t2 " .
-                "ON t1.studentId = t2.studentId WHERE (t2.date != ? OR t2.date IS NULL) AND t1.class = ? AND t2.section != ?");
-            $stmt->bind_param("sss", $data["date"], $data["classroom"], $data["cell"]);
-            $stmt->execute();
-            $stmt->bind_result($id, $name, $prefix);
-            while ($stmt->fetch()) {
-                array_push($result, array($id, ($prefix . " " . $name)));
+            $queryResult = null;
+            $studentCheckList =
+                $this->database->select(
+                "sectiondetail",
+                "studentId",
+                array("AND" => array("sectionId" => $data["cell"], "date" => $data["date"]))
+            );
+
+            if (count($studentCheckList) == 0) {
+                $queryResult = $this->database->select(
+                    "student",
+                    array("studentId", "name", "prefix")
+                );
+            } else {
+                $queryResult = $this->database->select(
+                    "student",
+                    array("studentId", "name", "prefix"),
+                    array("studentId[!]" => $studentCheckList)
+                );
             }
-            $stmt->close();
+
+            foreach ($queryResult as $student) {
+                array_push($result, array($student["studentId"], $student["prefix"] . " " . $student["name"]));
+            }
         } catch (Exception $ex) {
             $result["error"] = $ex->getMessage();
         }
@@ -84,16 +110,28 @@ class Timejob
     {
         $result = array();
         try {
-            $stmt = $this->mysql_connection->prepare("SELECT t1.studentId, t1.name, t1.prefix " .
-                "FROM student as t1 LEFT JOIN studentsess as t2 " .
-                "ON t1.studentId = t2.studentId WHERE t2.studentId IS NOT NULL AND t2.date = ? AND t1.class = ?");
-            $stmt->bind_param("ss", $data["date"], $data["classroom"]);
-            $stmt->execute();
-            $stmt->bind_result($id, $name, $prefix);
-            while ($stmt->fetch()) {
-                array_push($result, array($id, ($prefix . " " . $name)));
+            $queryResult = null;
+            $studentCheckList =
+                $this->database->select(
+                "sectiondetail",
+                "studentId",
+                array("AND" => array("sectionId" => $data["cell"], "date" => $data["date"]))
+            );
+
+            if (count($studentCheckList) >= 0) {
+                $queryResult = $this->database->select(
+                    "student",
+                    array("studentId", "name", "prefix"),
+                    array(
+                        "studentId" =>
+                            $studentCheckList
+                    )
+                );
             }
-            $stmt->close();
+
+            foreach ($queryResult as $student) {
+                array_push($result, array($student["studentId"], $student["prefix"] . " " . $student["name"]));
+            }
         } catch (Exception $ex) {
             $result["error"] = $ex->getMessage();
         }
@@ -104,17 +142,19 @@ class Timejob
     {
         $result = array();
         try {
-            $stmt = $this->mysql_connection->prepare("DELETE FROM studentsess WHERE section = ? AND date = ?");
-            $stmt->bind_param("ss", $data["cell"], $data["date"]);
-            $stmt->execute();
-            $stmt = $this->mysql_connection->prepare("ALTER TABLE studentsess AUTO_INCREMENT = 1");
-            $stmt->execute();
-            $stmt = $this->mysql_connection->prepare("INSERT INTO studentsess (section, studentId, date) VALUE(?, ?, ?)");
-            foreach ($data["studentPresentList"] as $student1) {
-                $stmt->bind_param("sss", $data["cell"], $student1[0], $data["date"]);
-                $stmt->execute();
+            $this->database->delete("sectiondetail", array("AND" =>
+                array(
+                "sectionId" => $data["cell"],
+                "date" => $data["date"]
+            )));
+            $this->database->query("ALTER TABLE sectiondetail AUTO_INCREMENT = 1");
+            foreach ($data["studentPresentList"] as $student) {
+                $this->database->insert("sectiondetail", array(
+                    "sectionId" => $data["cell"],
+                    "studentId" => $student[0],
+                    "date" => $data["date"]
+                ));
             }
-            $stmt->close();
         } catch (Exception $ex) {
             $result["error"] = $ex->getMessage();
         }
@@ -125,13 +165,13 @@ class Timejob
     {
         $result = array();
         try {
-            $stmt = $this->mysql_connection->prepare("SELECT timeId, time FROM timeTable");
-            $stmt->execute();
-            $stmt->bind_result($id, $time);
-            while ($stmt->fetch()) {
-                array_push($result, array("id" => $id, "time" => $time));
+            $queryResult = $this->database->select(
+                "timeTable",
+                array("timeId", "time")
+            );
+            foreach ($queryResult as $time) {
+                array_push($result, array("id" => $time["timeId"], "time" => $time["time"]));
             }
-            $stmt->close();
         } catch (Exception $ex) {
             $result['error'] = $ex->getMessage();
         }
@@ -142,10 +182,10 @@ class Timejob
     {
         $result = array();
         try {
-            $stmt = $this->mysql_connection->prepare("INSERT INTO timeTable (time) VALUES(?)");
-            $stmt->bind_param("s", $data["time"]);
-            $stmt->execute();
-            $stmt->close();
+            $this->database->insert(
+                "timeTable",
+                array("time" => $data["time"])
+            );
         } catch (Exception $ex) {
             $result['error'] = $ex->getMessage();
         }
