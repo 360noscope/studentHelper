@@ -71,12 +71,14 @@ if (isset($_COOKIE["STUHELP"])) {
     <div class="container topper">
         <div class="card border-0 shadow my-5">
             <div class="card-body p-5">
-                <h1 class="font-weight-light">เช็คชื่อนักเรียน</h1>
+                <h1 class="font-weight-light">ข้อมูลเช็คชื่อ/รับส่งนักเรียน</h1>
                 <form onsubmit="return false;">
                     <div class="form-inline" style="width:auto;">
                         <label for="classroomList">ห้องรียน</label>
                         <select id="classroomList" class="custom-select mr-2 ml-2">
                         </select>
+                        <button class="btn btn-info" data-toggle="modal"
+                            data-target="#travelDialog">รับ/ส่งนักเรียน</button>
                     </div>
                 </form>
                 <br />
@@ -132,6 +134,41 @@ if (isset($_COOKIE["STUHELP"])) {
         </div>
     </div>
 
+    <div class="modal fade" id="travelDialog" role="dialog">
+        <div class="modal-dialog modal-xl" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">ข้อมูลรับส่งนักเรียนห้อง <strong class="text-danger"
+                            id="roomSelect"></strong></h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <table id="traveltable" class="table table-striped table-bordered" style="width: 100%">
+                        <thead>
+                            <tr>
+                                <th></th>
+                                <th>ชื่อ-นามสกุล</th>
+                                <th>วัน-เวลา</th>
+                                <th>ประเภท</th>
+                                <th></th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                        </tbody>
+                    </table>
+                    <form method="POST" id="travelform">
+                        <div class="form-inline col-6">
+                            <label class="mr-2 mb-2">เลือกนักเรียน</label>
+                            <select class="custom-select mb-2 mr-2 col-6" id="travelStudentList"></select>
+                            <button class="btn btn-success mb-2" id="travelSubmitBtn" type="submit">ลงเวลารับ-ส่ง</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
 
     <div class="modal fade" id="addSection" role="dialog">
         <div class="modal-dialog" role="document">

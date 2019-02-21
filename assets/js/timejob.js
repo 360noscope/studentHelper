@@ -1,4 +1,4 @@
-var classTable, absentTable, presentTable, cellSelected;
+var classTable, absentTable, presentTable, cellSelected, travelTable;
 $(document).ready(function () {
 
     listClass();
@@ -86,6 +86,137 @@ $(document).ready(function () {
             }
         });
     });
+
+    $(document).on("show.bs.modal", "#travelDialog", function () {
+        if (travelTable != null) {
+            travelTable.ajax.reload();
+        } else {
+            travelTable = $('#traveltable').DataTable({
+                info: false,
+                processing: true,
+                lengthMenu: [[5, 10, 25, 50, -1], [5, 10, 25, 50, "All"]],
+                language: {
+                    processing: "กำลังโหลดข้อมูล...",
+                    search: "ค้นหา:",
+                    lengthMenu: "จำนวนที่แสดงผล _MENU_ รายการ",
+                    loadingRecords: "กำลังโหลดข้อมูล...",
+                    zeroRecords: "ไม่มีข้อมูลในระบบ",
+                    emptyTable: "ไม่มีข้อมูลในระบบ",
+                    paginate: {
+                        first: "รายการแรก",
+                        previous: "ก่อนหน้า",
+                        next: "ถัดไป",
+                        last: "รายการสุดท้าย"
+                    }
+                },
+                columnDefs: [
+                    {
+                        targets: [0],
+                        className: "text-center",
+                        orderable: false,
+                        searchable: false,
+                        visible: false
+                    },
+                    {
+                        targets: [1],
+                        className: "text-center"
+                    },
+                    {
+                        targets: [2],
+                        className: "text-center"
+                    },
+                    {
+                        targets: [3],
+                        className: "text-center"
+                    },
+                    {
+                        targets: [4],
+                        className: "text-center",
+                        defaultContent: "<button class='btn btn-danger' id='deleteTravel'>ลบ</button>"
+                    }
+                ],
+                ajax: {
+                    url: "./assets/function/Timejob.php",
+                    type: "POST",
+                    data: {
+                        action: "listTravel",
+                        data: {
+                            classroom: function () { return $("#classroomList").val() }
+                        }
+                    }
+                }
+            });
+        }
+
+        $(document).on("click", "#deleteTravel", function(e){
+            var selectedTravel = travelTable.row($(this).parents('tr')).data();
+            $.ajax({
+                type: 'POST',
+                url: './assets/function/Timejob.php',
+                data: {
+                    action: "deleteTravel",
+                    data: {
+                        id: selectedTravel[0]
+                    }
+                },
+                success: function (data) {
+                    var returnData = JSON.parse(data)["data"];
+                    travelTable.ajax.reload();
+                    timeRecordButton();
+                }
+            });
+        });
+
+        $(document).on("change", "#travelStudentList", function (e) {
+            timeRecordButton();
+        });
+
+        $("#roomSelect").html(
+            $("#classroomList option:selected").text()
+        );
+
+        $.ajax({
+            type: 'POST',
+            url: './assets/function/Student.php',
+            data: {
+                action: "listStudent",
+                data: {
+                    classroom: function () { return $("#classroomList").val() }
+                }
+            },
+            success: function (data) {
+                var returnData = JSON.parse(data)["data"];
+                $("#travelStudentList").empty();
+                returnData.forEach(function (item) {
+                    var opt = new Option(item[1], item[0]);
+                    $("#travelStudentList").append(opt);
+                });
+                timeRecordButton();
+            }
+        });
+
+        $(document).on("submit", "#travelform", function (e) {
+            e.preventDefault();
+            $.ajax({
+                type: 'POST',
+                url: './assets/function/Timejob.php',
+                data: {
+                    action: "insertTravel",
+                    data: {
+                        id: function () { return $("#travelStudentList").val() }
+                    }
+                },
+                success: function (data) {
+                    var returnData = JSON.parse(data)["data"];
+
+                }
+            });
+            travelTable.ajax.reload();
+            timeRecordButton();
+        });
+
+    });
+
 
     $(document).on("click", "#viewStudentList", function (e) {
         var selectedCell = classTable.row($(this).parents('tr')).data();
@@ -280,6 +411,27 @@ function listStudentSchedule() {
             }
         });
     }
+}
+
+function timeRecordButton() {
+    $.ajax({
+        type: 'POST',
+        url: './assets/function/Timejob.php',
+        data: {
+            action: "homeCheck",
+            data: {
+                id: function () { return $("#travelStudentList").val() }
+            }
+        },
+        success: function (data) {
+            returnData = JSON.parse(data);
+            if (returnData["result"] == true) {
+                $("#travelSubmitBtn").attr("disabled", true);
+            } else {
+                $("#travelSubmitBtn").attr("disabled", false);
+            }
+        }
+    });
 }
 
 function listTime() {

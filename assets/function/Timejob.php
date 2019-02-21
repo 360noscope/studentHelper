@@ -192,6 +192,102 @@ class Timejob
         return json_encode($result);
     }
 
+    public function listTravel($data)
+    {
+        $result = array();
+        try {
+            $queryResult = $this->database->select(
+                "traveldata",
+                array("[>]student" => array("studentId" => "studentId")),
+                array(
+                    "travelId",
+                    "prefix",
+                    "name",
+                    "date",
+                    "time",
+                    "type"
+                ),
+                array("student.class" => $data["classroom"])
+            );
+            foreach ($queryResult as $travel) {
+                array_push($result, array(
+                    $travel["travelId"],
+                    $travel["prefix"] . $travel["name"],
+                    $travel["date"] . " " . $travel["time"],
+                    $travel["type"]
+                ));
+            }
+        } catch (Exception $ex) {
+            $result['error'] = $ex->getMessage();
+        }
+        return json_encode(array("data" => $result));
+    }
+
+    public function insertTravel($data)
+    {
+        $result = array();
+        try {
+            $currentDate = date('Y-m-d', time());
+            $currentTime = date('h:i:s', time());
+            $type = "มาโรงเรียน";
+            $cometoschool = $this->database->has(
+                "traveldata",
+                array("AND" => array(
+                    "studentId" => $data["id"],
+                    "type" => "มาโรงเรียน",
+                    "date" => $currentDate
+                ))
+            );
+            if ($cometoschool == true) {
+                $type = "กลับบ้าน";
+
+            }
+            $this->database->insert(
+                "traveldata",
+                array(
+                    "studentId" => $data["id"],
+                    "date" => $currentDate,
+                    "time" => $currentTime,
+                    "type" => $type
+                )
+            );
+        } catch (Exception $ex) {
+            $result['error'] = $ex->getMessage();
+        }
+        return json_encode($result);
+    }
+
+    public function homeCheck($data)
+    {
+        $result = array();
+        try {
+            $currentDate = date('Y-m-d', time());
+            $comehome = $this->database->has(
+                "traveldata",
+                array("AND" => array(
+                    "studentId" => $data["id"],
+                    "type" => "กลับบ้าน",
+                    "date" => $currentDate
+                ))
+            );
+            $result["result"] = $comehome;
+        } catch (Exception $ex) {
+            $result['error'] = $ex->getMessage();
+        }
+        return json_encode($result);
+    }
+
+    public function deleteTravel($data)
+    {
+        $result = array();
+        try {
+            $this->database->delete("traveldata", array("travelId" => $data["id"]));
+        } catch (Exception $ex) {
+            $result['error'] = $ex->getMessage();
+        }
+        return json_encode($result);
+    }
+
     public function insertSubjectCell($data)
     {
         $result = array();
@@ -262,5 +358,13 @@ if ($requestAction == "listSection") {
     echo $timer->listPresentName($_POST["data"]);
 } else if ($requestAction == "checkinStudent") {
     echo $timer->studentCheckin($_POST["data"]);
+} else if ($requestAction == "listTravel") {
+    echo $timer->listTravel($_POST["data"]);
+} else if ($requestAction == "insertTravel") {
+    echo $timer->insertTravel($_POST["data"]);
+} else if ($requestAction == "homeCheck") {
+    echo $timer->homeCheck($_POST["data"]);
+}else if($requestAction =="deleteTravel"){
+    echo $timer->deleteTravel($_POST["data"]);
 }
 ?>

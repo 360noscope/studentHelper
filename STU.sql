@@ -52,7 +52,8 @@ CREATE TABLE `sectiondetail` (
   `sectionId` int(6) unsigned zerofill NOT NULL,
   `studentId` int(5) unsigned zerofill NOT NULL,
   `date` varchar(80) NOT NULL,
-  PRIMARY KEY (`sectionId`,`studentId`,`date`)
+  PRIMARY KEY (`sectionId`,`studentId`,`date`),
+  CONSTRAINT `sectId` FOREIGN KEY (`sectionId`) REFERENCES `sectiontable` (`sectionId`) ON DELETE CASCADE ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
@@ -150,6 +151,32 @@ INSERT INTO `timetable` VALUES (01,'08:30 - 09:20'),(02,'09:20 - 10:10'),(03,'10
 UNLOCK TABLES;
 
 --
+-- Table structure for table `traveldata`
+--
+
+DROP TABLE IF EXISTS `traveldata`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+ SET character_set_client = utf8mb4 ;
+CREATE TABLE `traveldata` (
+  `travelId` int(6) unsigned zerofill NOT NULL AUTO_INCREMENT,
+  `studentId` int(5) unsigned zerofill DEFAULT NULL,
+  `date` date DEFAULT NULL,
+  `time` time DEFAULT NULL,
+  `type` varchar(45) DEFAULT NULL,
+  PRIMARY KEY (`travelId`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `traveldata`
+--
+
+LOCK TABLES `traveldata` WRITE;
+/*!40000 ALTER TABLE `traveldata` DISABLE KEYS */;
+/*!40000 ALTER TABLE `traveldata` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
 -- Table structure for table `userdetail`
 --
 
@@ -208,4 +235,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2019-02-18 16:09:11
+-- Dump completed on 2019-02-21 16:36:43
