@@ -148,7 +148,7 @@ $(document).ready(function () {
             });
         }
 
-        $(document).on("click", "#deleteTravel", function(e){
+        $(document).on("click", "#deleteTravel", function (e) {
             var selectedTravel = travelTable.row($(this).parents('tr')).data();
             $.ajax({
                 type: 'POST',
@@ -187,11 +187,15 @@ $(document).ready(function () {
             success: function (data) {
                 var returnData = JSON.parse(data)["data"];
                 $("#travelStudentList").empty();
-                returnData.forEach(function (item) {
-                    var opt = new Option(item[1], item[0]);
-                    $("#travelStudentList").append(opt);
-                });
-                timeRecordButton();
+                if (returnData.length == 0) {
+                    $("#travelSubmitBtn").attr("disabled", false);
+                } else {
+                    returnData.forEach(function (item) {
+                        var opt = new Option(item[1], item[0]);
+                        $("#travelStudentList").append(opt);
+                    });
+                    timeRecordButton();
+                }
             }
         });
 

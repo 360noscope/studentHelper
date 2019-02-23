@@ -79,10 +79,10 @@ class Timejob
             $queryResult = null;
             $studentCheckList =
                 $this->database->select(
-                "sectiondetail",
-                "studentId",
-                array("AND" => array("sectionId" => $data["cell"], "date" => $data["date"]))
-            );
+                    "sectiondetail",
+                    "studentId",
+                    array("AND" => array("sectionId" => $data["cell"], "date" => $data["date"]))
+                );
 
             if (count($studentCheckList) == 0) {
                 $queryResult = $this->database->select(
@@ -113,10 +113,10 @@ class Timejob
             $queryResult = null;
             $studentCheckList =
                 $this->database->select(
-                "sectiondetail",
-                "studentId",
-                array("AND" => array("sectionId" => $data["cell"], "date" => $data["date"]))
-            );
+                    "sectiondetail",
+                    "studentId",
+                    array("AND" => array("sectionId" => $data["cell"], "date" => $data["date"]))
+                );
 
             if (count($studentCheckList) >= 0) {
                 $queryResult = $this->database->select(
@@ -124,7 +124,7 @@ class Timejob
                     array("studentId", "name", "prefix"),
                     array(
                         "studentId" =>
-                            $studentCheckList
+                        $studentCheckList
                     )
                 );
             }
@@ -143,7 +143,7 @@ class Timejob
         $result = array();
         try {
             $this->database->delete("sectiondetail", array("AND" =>
-                array(
+            array(
                 "sectionId" => $data["cell"],
                 "date" => $data["date"]
             )));
@@ -240,7 +240,6 @@ class Timejob
             );
             if ($cometoschool == true) {
                 $type = "กลับบ้าน";
-
             }
             $this->database->insert(
                 "traveldata",
@@ -320,12 +319,8 @@ class Timejob
     {
         $result = array();
         try {
-            $stmt = $this->mysql_connection->prepare("DELETE FROM sectiontable WHERE sectionId = ?");
-            $stmt->bind_param("s", $data["id"]);
-            $stmt->execute();
-            $stmt = $this->mysql_connection->prepare("ALTER TABLE sectiontable AUTO_INCREMENT = 1");
-            $stmt->execute();
-            $stmt->close();
+            $this->database->delete("sectiontable", array("sectionId" => $data["id"]));
+            $this->database->query("ALTER TABLE sectiontable AUTO_INCREMENT = 1");
         } catch (Exception $ex) {
             $result['error'] = $ex->getMessage();
         }
@@ -364,7 +359,9 @@ if ($requestAction == "listSection") {
     echo $timer->insertTravel($_POST["data"]);
 } else if ($requestAction == "homeCheck") {
     echo $timer->homeCheck($_POST["data"]);
-}else if($requestAction =="deleteTravel"){
+} else if ($requestAction == "deleteTravel") {
     echo $timer->deleteTravel($_POST["data"]);
+} else if($requestAction == "deleteSubjectCell"){
+    echo $timer->deleteSubjectCell($_POST["data"]);
 }
-?>
+ 

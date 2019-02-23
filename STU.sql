@@ -37,7 +37,7 @@ CREATE TABLE `classroom` (
 
 LOCK TABLES `classroom` WRITE;
 /*!40000 ALTER TABLE `classroom` DISABLE KEYS */;
-INSERT INTO `classroom` VALUES (000008,'3/1'),(000009,'2/2');
+INSERT INTO `classroom` VALUES (000008,'3/1');
 /*!40000 ALTER TABLE `classroom` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -53,7 +53,9 @@ CREATE TABLE `sectiondetail` (
   `studentId` int(5) unsigned zerofill NOT NULL,
   `date` varchar(80) NOT NULL,
   PRIMARY KEY (`sectionId`,`studentId`,`date`),
-  CONSTRAINT `sectId` FOREIGN KEY (`sectionId`) REFERENCES `sectiontable` (`sectionId`) ON DELETE CASCADE ON UPDATE CASCADE
+  KEY `stuId_idx` (`studentId`),
+  CONSTRAINT `stuId` FOREIGN KEY (`studentId`) REFERENCES `student` (`studentId`) ON DELETE CASCADE ON UPDATE CASCADE,
+  CONSTRAINT `subcell` FOREIGN KEY (`sectionId`) REFERENCES `sectiontable` (`sectionId`) ON DELETE CASCADE ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
@@ -63,7 +65,6 @@ CREATE TABLE `sectiondetail` (
 
 LOCK TABLES `sectiondetail` WRITE;
 /*!40000 ALTER TABLE `sectiondetail` DISABLE KEYS */;
-INSERT INTO `sectiondetail` VALUES (000001,29717,'18-02-2019'),(000001,29718,'18-02-2019');
 /*!40000 ALTER TABLE `sectiondetail` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -83,7 +84,7 @@ CREATE TABLE `sectiontable` (
   PRIMARY KEY (`sectionId`),
   KEY `time_idx` (`time`),
   CONSTRAINT `time` FOREIGN KEY (`time`) REFERENCES `timetable` (`timeId`) ON UPDATE CASCADE
-) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -92,7 +93,6 @@ CREATE TABLE `sectiontable` (
 
 LOCK TABLES `sectiontable` WRITE;
 /*!40000 ALTER TABLE `sectiontable` DISABLE KEYS */;
-INSERT INTO `sectiontable` VALUES (000001,000008,'จันทร์',01,'test'),(000002,000008,'จันทร์',02,'test2');
 /*!40000 ALTER TABLE `sectiontable` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -122,7 +122,6 @@ CREATE TABLE `student` (
 
 LOCK TABLES `student` WRITE;
 /*!40000 ALTER TABLE `student` DISABLE KEYS */;
-INSERT INTO `student` VALUES (29717,'นาย','ภาณุพงศ์  ปรึกษา','ไผ่',000008,'-'),(29718,'นาย','สุรพล ชาติเชื้อ','นาย',000008,'-');
 /*!40000 ALTER TABLE `student` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -137,7 +136,7 @@ CREATE TABLE `timetable` (
   `timeId` int(2) unsigned zerofill NOT NULL AUTO_INCREMENT,
   `time` varchar(70) DEFAULT NULL,
   PRIMARY KEY (`timeId`)
-) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=5 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -163,7 +162,9 @@ CREATE TABLE `traveldata` (
   `date` date DEFAULT NULL,
   `time` time DEFAULT NULL,
   `type` varchar(45) DEFAULT NULL,
-  PRIMARY KEY (`travelId`)
+  PRIMARY KEY (`travelId`),
+  KEY `stu2_idx` (`studentId`),
+  CONSTRAINT `stu2` FOREIGN KEY (`studentId`) REFERENCES `student` (`studentId`) ON DELETE CASCADE ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
@@ -235,4 +236,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2019-02-21 16:36:43
+-- Dump completed on 2019-02-23 10:36:27
